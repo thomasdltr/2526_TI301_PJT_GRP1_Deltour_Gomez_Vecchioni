@@ -3,4 +3,9 @@ project(TI_301_PRJ_STUDENTS_master C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(TI_301_PRJ_STUDENTS_master main.c)
+add_executable(TI_301_PRJ_STUDENTS_master
+        main.c
+        utils.c
+        hasse.c
+        graph.c
+)
