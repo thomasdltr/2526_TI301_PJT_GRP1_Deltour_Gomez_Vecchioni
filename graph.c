@@ -1,4 +1,6 @@
 #include "graph.h"
+#include <string.h>
+#include <math.h>
 
 /* ------------ outils listes ------------ */
 
@@ -41,8 +43,7 @@ void list_print(const List *L) {
 AdjList adj_create(int n) {
     AdjList G;
     G.n = n;
-    // on alloue n+1 pour indexer de 1 à n
-    G.arr = (List*)malloc((n + 1) * sizeof(List));
+    G.arr = (List*)malloc((n + 1) * sizeof(List)); // index 1..n
     if (!G.arr) {
         perror("malloc");
         exit(EXIT_FAILURE);
@@ -56,7 +57,6 @@ void adj_add_edge(AdjList *G, int u, int v, float p) {
         fprintf(stderr, "Edge out of bounds: %d -> %d\n", u, v);
         exit(EXIT_FAILURE);
     }
-    // on ajoute en tête: ordre affiché = inverse d’insertion (comme dans l’exemple du sujet)
     list_push_front(&G->arr[u], v, p);
 }
 
@@ -85,7 +85,7 @@ void adj_free(AdjList *G) {
 /* --------------- lecture fichier --------------- */
 
 AdjList readGraph(const char *filename) {
-    FILE *file = fopen(filename, "rt"); // read-only, text
+    FILE *file = fopen(filename, "rt");
     if (file == NULL) {
         perror("Could not open file for reading");
         exit(EXIT_FAILURE);
@@ -103,11 +103,87 @@ AdjList readGraph(const char *filename) {
     int depart, arrivee;
     float proba;
 
-    // pour chaque ligne: depart arrivee proba
     while (fscanf(file, "%d %d %f", &depart, &arrivee, &proba) == 3) {
         adj_add_edge(&G, depart, arrivee, proba);
     }
 
     fclose(file);
     return G;
+}
+
+/* --------------- étape 2 : vérification Markov --------------- */
+
+bool adj_is_markov(const AdjList *G) {
+    bool is_ok = true;
+
+    for (int u = 1; u <= G->n; ++u) {
+        float sum = 0.0f;
+        const Cell *cur = G->arr[u].head;
+        while (cur) {
+            sum += cur->prob;
+            cur = cur->next;
+        }
+
+        if (sum < 0.99f || sum > 1.01f) {
+            printf("Sommet %d : somme = %.2f (non valide)\n", u, sum);
+            is_ok = false;
+        }
+    }
+
+    return is_ok;
+}
+
+/* --------------- étape 3 : génération fichier Mermaid --------------- */
+
+// Convertit un entier (1..∞) en identifiant : A, B, ..., Z, AA, AB, ...
+char *getId(int num) {
+    static char buffer[8];
+    int i = 0;
+    char temp[8];
+    num--; // base 0
+
+    while (num >= 0) {
+        temp[i++] = 'A' + (num % 26);
+        num = num / 26 - 1;
+    }
+
+    for (int j = 0; j < i; ++j) {
+        buffer[j] = temp[i - j - 1];
+    }
+    buffer[i] = '\0';
+    return buffer;
+}
+
+// Génère le fichier Mermaid pour visualisation
+void adj_to_mermaid(const AdjList *G, const char *filename) {
+    FILE *f = fopen(filename, "wt");
+    if (!f) {
+        perror("Could not open file for writing");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(f, "---\n");
+    fprintf(f, "config:\n");
+    fprintf(f, "   layout: elk\n");
+    fprintf(f, "   theme: neo\n");
+    fprintf(f, "   look: neo\n");
+    fprintf(f, "---\n\n");
+    fprintf(f, "flowchart LR\n");
+
+    // Déclaration des sommets
+    for (int u = 1; u <= G->n; ++u) {
+        fprintf(f, "%s((%d))\n", getId(u), u);
+    }
+
+    fprintf(f, "\n");
+    // Déclaration des arêtes
+    for (int u = 1; u <= G->n; ++u) {
+        const Cell *cur = G->arr[u].head;
+        while (cur) {
+            fprintf(f, "%s -->|%.2f|%s\n", getId(u), cur->prob, getId(cur->dest));
+            cur = cur->next;
+        }
+    }
+
+    fclose(f);
 }

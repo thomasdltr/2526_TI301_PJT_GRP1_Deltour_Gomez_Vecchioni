@@ -1,4 +1,4 @@
-"C:\Program Files\JetBrains\CLion 2024.3.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2024.3.2/bin/ninja/win/x64/ninja.exe" -G Ninja -S C:\Users\thoma\Downloads\TI_301_PRJ_STUDENTS-master -B C:\Users\thoma\Downloads\TI_301_PRJ_STUDENTS-master\cmake-build-debug
+"D:\CLion 2024.3.4\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "MinGW Makefiles" -S C:\Users\alexa\CLionProjects\2526_TI301_PJT_GRP1_Deltour_Gomez_Vecchioni -B C:\Users\alexa\CLionProjects\2526_TI301_PJT_GRP1_Deltour_Gomez_Vecchioni\cmake-build-debug
 -- Configuring done (0.2s)
 CMake Error at CMakeLists.txt:6 (add_executable):
   Cannot find source file:

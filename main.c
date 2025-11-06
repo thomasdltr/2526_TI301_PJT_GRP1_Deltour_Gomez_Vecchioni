@@ -2,15 +2,23 @@
 #include "graph.h"
 
 int main(void) {
-    // Chemin du fichier de données.
-    // Si CLion exécute dans cmake-build-debug, mets "../data/exemple1.txt"
-    // Sinon, règle le "Working directory" sur le dossier projet et utilise "data/exemple1.txt".
     const char *path = "../data/exemple1.txt"; // adapte si besoin
 
     AdjList G = readGraph(path);
 
-    printf("=== Affichage de la liste d'adjacence ===\n");
+    printf("=== Étape 1 : Affichage de la liste d'adjacence ===\n");
     adj_print(&G);
+
+    printf("\n=== Étape 2 : Vérification du graphe de Markov ===\n");
+    if (adj_is_markov(&G)) {
+        printf("Le graphe est un graphe de Markov.\n");
+    } else {
+        printf("Le graphe n'est PAS un graphe de Markov.\n");
+    }
+
+    printf("\n=== Étape 3 : Génération du fichier Mermaid ===\n");
+    adj_to_mermaid(&G, "graph_mermaid.txt");
+    printf("Fichier 'graph_mermaid.txt' généré avec succès !\n");
 
     adj_free(&G);
     return 0;

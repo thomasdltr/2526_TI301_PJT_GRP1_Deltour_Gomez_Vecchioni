@@ -8,4 +8,6 @@ add_executable(TI_301_PRJ_STUDENTS_master
         utils.c
         hasse.c
         graph.c
+        graph.c
+        graph.c
 )
