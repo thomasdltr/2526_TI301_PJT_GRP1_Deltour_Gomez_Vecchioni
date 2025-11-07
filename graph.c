@@ -2,8 +2,6 @@
 #include <string.h>
 #include <math.h>
 
-/* ------------ outils listes ------------ */
-
 Cell* make_cell(int dest, float prob) {
     Cell *c = (Cell*)malloc(sizeof(Cell));
     if (!c) {
@@ -37,8 +35,6 @@ void list_print(const List *L) {
     }
     printf("\n");
 }
-
-/* ----------- liste d’adjacence ---------- */
 
 AdjList adj_create(int n) {
     AdjList G;
@@ -82,7 +78,6 @@ void adj_free(AdjList *G) {
     G->n = 0;
 }
 
-/* --------------- lecture fichier --------------- */
 
 AdjList readGraph(const char *filename) {
     FILE *file = fopen(filename, "rt");
@@ -111,7 +106,7 @@ AdjList readGraph(const char *filename) {
     return G;
 }
 
-/* --------------- étape 2 : vérification Markov --------------- */
+// étape 2
 
 bool adj_is_markov(const AdjList *G) {
     bool is_ok = true;
@@ -133,9 +128,9 @@ bool adj_is_markov(const AdjList *G) {
     return is_ok;
 }
 
-/* --------------- étape 3 : génération fichier Mermaid --------------- */
+// étape 3
 
-// Convertit un entier (1..∞) en identifiant : A, B, ..., Z, AA, AB, ...
+// Convertit un entier
 char *getId(int num) {
     static char buffer[8];
     int i = 0;
