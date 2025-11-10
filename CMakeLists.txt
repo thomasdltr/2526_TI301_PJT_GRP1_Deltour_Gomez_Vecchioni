@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 11)
 add_executable(TI_301_PRJ_STUDENTS_master
         main.c
         graph.c
+        tarjan.c
 )
 
 # (optionnel) si tu as un fichier de données à copier vers le dossier de build :
