@@ -243,6 +243,109 @@ TarjanPartition tarjan_run(const AdjList *G)
     return P; // (les classes/members sont possédés par P)
 }
 
+// ============================================================================
+//  Hasse - Construction du diagramme entre classes (CFC)
+// ============================================================================
+
+// Vérifie si un lien (from->to) existe déjà
+static int link_exists(const t_link_array *L, int from, int to) {
+    for (int i = 0; i < L->size; ++i) {
+        if (L->data[i].from == from && L->data[i].to == to) return 1;
+    }
+    return 0;
+}
+
+// map[v] = index de la classe dans la partition
+int* build_vertex_to_class(const TarjanPartition *P, int n) {
+    int *map = malloc((n + 1) * sizeof(int));
+    if (!map) { perror("malloc map vertex->class"); exit(EXIT_FAILURE); }
+    for (int i = 0; i <= n; ++i) map[i] = -1;
+
+    for (int ci = 0; ci < P->size; ++ci) {
+        const TarjanClass *C = &P->classes[ci];
+        for (int k = 0; k < C->size; ++k) {
+            int v = C->members[k];
+            if (v >= 1 && v <= n) map[v] = ci;
+        }
+    }
+    return map;
+}
+
+// Ajoute un lien dans la structure dynamique
+static void push_link(t_link_array *L, int a, int b) {
+    if (L->size >= L->capacity) {
+        int nc = (L->capacity < 8) ? 8 : L->capacity * 2;
+        L->data = realloc(L->data, nc * sizeof(t_link));
+        if (!L->data) { perror("realloc links"); exit(EXIT_FAILURE); }
+        L->capacity = nc;
+    }
+    L->data[L->size].from = a;
+    L->data[L->size].to = b;
+    L->size++;
+}
+
+// Crée tous les liens entre classes
+void build_class_links(const AdjList *G, const TarjanPartition *P, t_link_array *links) {
+    links->data = NULL;
+    links->size = 0;
+    links->capacity = 0;
+
+    int *v2c = build_vertex_to_class(P, G->n);
+
+    for (int u = 1; u <= G->n; ++u) {
+        int ci = v2c[u];
+        for (Cell *e = G->arr[u].head; e != NULL; e = e->next) {
+            int v = e->dest;
+            int cj = v2c[v];
+            if (ci != cj && ci >= 0 && cj >= 0) {
+                if (!link_exists(links, ci, cj))
+                    push_link(links, ci, cj);
+            }
+        }
+    }
+
+    free(v2c);
+}
+
+// Affiche les liens entre classes
+void print_class_links(const t_link_array *links) {
+    for (int i = 0; i < links->size; ++i)
+        printf("Lien C%d -> C%d\n", links->data[i].from + 1, links->data[i].to + 1);
+}
+
+// Écrit une classe au format {1,7,5}
+static void write_class_label(FILE *f, const TarjanClass *C) {
+    fprintf(f, "{");
+    for (int i = 0; i < C->size; ++i) {
+        fprintf(f, "%d", C->members[i]);
+        if (i + 1 < C->size) fprintf(f, ",");
+    }
+    fprintf(f, "}");
+}
+
+// Exporte le diagramme de Hasse en format Mermaid
+void hasse_to_mermaid(const TarjanPartition *P, const t_link_array *links, const char *filename) {
+    FILE *f = fopen(filename, "wt");
+    if (!f) { perror("open mermaid hasse"); exit(EXIT_FAILURE); }
+
+    fprintf(f, "---\nconfig:\n  layout: elk\n  theme: neo\n  look: neo\n---\n\n");
+    fprintf(f, "flowchart TB\n");
+
+    // Nœuds (une box par classe)
+    for (int i = 0; i < P->size; ++i) {
+        fprintf(f, "C%d[\"", i + 1);
+        write_class_label(f, &P->classes[i]);
+        fprintf(f, "\"]\n");
+    }
+
+    fprintf(f, "\n");
+    // Liens
+    for (int i = 0; i < links->size; ++i) {
+        fprintf(f, "C%d --> C%d\n", links->data[i].from + 1, links->data[i].to + 1);
+    }
+
+    fclose(f);
+}
 
 
 

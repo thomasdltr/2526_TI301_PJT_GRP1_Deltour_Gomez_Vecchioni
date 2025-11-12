@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include "graph.h"   // pour AdjList (Partie 1)
+#include "hasse.h"
+
 
 // ---------- 1) Infos par sommet pour Tarjan ----------
 typedef struct {
@@ -66,6 +68,21 @@ void            partition_print(const TarjanPartition *P);
 TarjanPartition tarjan_run(const AdjList *G);
 
 TarjanPartition tarjan_run(const AdjList *G);
+
+// ======================= Hasse (diagramme entre classes) =======================
+
+// Associe chaque sommet à la classe à laquelle il appartient
+int* build_vertex_to_class(const TarjanPartition *P, int n);
+
+// Crée la liste des liens entre classes à partir du graphe et de la partition
+void build_class_links(const AdjList *G, const TarjanPartition *P, t_link_array *links);
+
+// Affiche les liens (debug)
+void print_class_links(const t_link_array *links);
+
+// Exporte le diagramme de Hasse au format Mermaid
+void hasse_to_mermaid(const TarjanPartition *P, const t_link_array *links, const char *filename);
+
 
 
 #endif // TARJAN_H

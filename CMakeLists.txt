@@ -6,7 +6,7 @@ add_executable(TI_301_PRJ_STUDENTS_master
         main.c
         graph.c
         tarjan.c
+        hasse.c
+        caracteristiques.c
 )
 
-# (optionnel) si tu as un fichier de données à copier vers le dossier de build :
-# file(COPY ${CMAKE_SOURCE_DIR}/data/exemple1.txt DESTINATION ${CMAKE_BINARY_DIR}/data)
