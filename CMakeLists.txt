@@ -8,5 +8,7 @@ add_executable(TI_301_PRJ_STUDENTS_master
         tarjan.c
         hasse.c
         caracteristiques.c
+        matrix.c
+
 )
 

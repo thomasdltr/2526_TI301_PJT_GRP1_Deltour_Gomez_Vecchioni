@@ -79,6 +79,12 @@ build CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/caracteristiques.c.obj: C_COMPIL
   OBJECT_DIR = CMakeFiles\TI_301_PRJ_STUDENTS_master.dir
   OBJECT_FILE_DIR = CMakeFiles\TI_301_PRJ_STUDENTS_master.dir
 
+build CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/matrix.c.obj: C_COMPILER__TI_301_PRJ_STUDENTS_master_unscanned_Debug C$:/Users/thoma/CLionProjects/TI_301_PRJ_DELTOUR-GOMEZ-VECCHIONI-master/matrix.c || cmake_object_order_depends_target_TI_301_PRJ_STUDENTS_master
+  DEP_FILE = CMakeFiles\TI_301_PRJ_STUDENTS_master.dir\matrix.c.obj.d
+  FLAGS = -g -std=gnu11 -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\TI_301_PRJ_STUDENTS_master.dir
+  OBJECT_FILE_DIR = CMakeFiles\TI_301_PRJ_STUDENTS_master.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target TI_301_PRJ_STUDENTS_master
@@ -87,7 +93,7 @@ build CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/caracteristiques.c.obj: C_COMPIL
 #############################################
 # Link the executable TI_301_PRJ_STUDENTS_master.exe
 
-build TI_301_PRJ_STUDENTS_master.exe: C_EXECUTABLE_LINKER__TI_301_PRJ_STUDENTS_master_Debug CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/main.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/graph.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/tarjan.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/hasse.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/caracteristiques.c.obj
+build TI_301_PRJ_STUDENTS_master.exe: C_EXECUTABLE_LINKER__TI_301_PRJ_STUDENTS_master_Debug CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/main.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/graph.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/tarjan.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/hasse.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/caracteristiques.c.obj CMakeFiles/TI_301_PRJ_STUDENTS_master.dir/matrix.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\TI_301_PRJ_STUDENTS_master.dir
