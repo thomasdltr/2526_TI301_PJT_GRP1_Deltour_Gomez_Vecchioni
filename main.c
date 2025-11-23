@@ -23,18 +23,18 @@ int main(void) {
 
     AdjList G = readGraph(path);
 
-    printf("\n1) Liste d'adjacence :\n");
+    printf("\n1) Liste d adjacence :\n");
     adj_print(&G);
 
-    printf("\n2) Vérification Markov :\n");
+    printf("\n2) Verification Markov :\n");
     if (adj_is_markov(&G))
         printf("Le graphe est un graphe de Markov.\n");
     else
-        printf("Le graphe n'est pas un graphe de Markov.\n");
+        printf("Le graphe n est pas un graphe de Markov.\n");
 
     printf("\n3) Export du graphe au format Mermaid...\n");
     adj_to_mermaid(&G, "graph_mermaid.txt");
-    printf("Fichier 'graph_mermaid.txt' généré.\n");
+    printf("Fichier 'graph_mermaid.txt' genere.\n");
 
     /* ================================================
        PARTIE 2 : Composantes fortement connexes (SCC)
@@ -52,9 +52,9 @@ int main(void) {
 
     removeTransitiveLinks(&L);
     hasse_to_mermaid(&P, &L, "hasse_mermaid.txt");
-    printf("Fichier 'hasse_mermaid.txt' généré.\n");
+    printf("Fichier 'hasse_mermaid.txt' genere.\n");
 
-    printf("\n5) Caractéristiques du graphe :\n");
+    printf("\n5) Caracteristiques du graphe :\n");
     printGraphCharacteristics(&P, &L);
 
     /* ====================================
@@ -67,7 +67,7 @@ int main(void) {
     printf("\nMatrice M :\n");
     matrix_print(M, G.n);
 
-    /* M³ */
+    /* M^3 */
     float **M2 = matrix_create(G.n);
     float **M3 = matrix_create(G.n);
 
@@ -77,7 +77,7 @@ int main(void) {
     printf("M^3 :\n");
     matrix_print(M3, G.n);
 
-    /* M⁷ */
+    /* M^7 */
     float **tmp = matrix_create(G.n);
     matrix_copy(tmp, M3, G.n);
 
@@ -105,7 +105,7 @@ int main(void) {
         float d = matrix_diff(A, B, G.n);
 
         if (d < 0.01f) {
-            printf("Convergence atteinte après %d itérations (diff = %.4f)\n", n_iter, d);
+            printf("Convergence atteinte apres %d iterations (diff = %.4f)\n", n_iter, d);
             break;
         }
 
@@ -113,7 +113,7 @@ int main(void) {
         n_iter++;
 
         if (n_iter > 1000) {
-            printf("Pas de convergence trouvée.\n");
+            printf("Pas de convergence trouvee.\n");
             break;
         }
     }
@@ -121,7 +121,7 @@ int main(void) {
     printf("\nM^n (limite) :\n");
     matrix_print(B, G.n);
 
-    /* Libération mémoire */
+    /* Liberation memoire */
     free(L.data);
     partition_free(&P);
     adj_free(&G);

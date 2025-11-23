@@ -1,8 +1,6 @@
 #include "matrix.h"
 
-// ===============================
-// Création d'une matrice n×n
-// ===============================
+
 
 float **matrix_create(int n) {
     float **M = malloc(n * sizeof(float *));

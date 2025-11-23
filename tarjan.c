@@ -1,6 +1,7 @@
 #include "tarjan.h"
 
 // ---------- TarjanVertex array ----------
+// Initialise le tableau des sommets internes utilisés par Tarjan
 TarjanVertex* tarjan_init_vertices(const AdjList *G) {
     if (!G || G->n <= 0) return NULL;
     // on alloue n+1 pour indexer de 1..n (on ignore l'indice 0)
@@ -11,19 +12,21 @@ TarjanVertex* tarjan_init_vertices(const AdjList *G) {
     }
     for (int i = 0; i <= G->n; ++i) {
         arr[i].id = i;
-        arr[i].index = -1;
-        arr[i].lowlink = -1;
-        arr[i].on_stack = 0;
+        arr[i].index = -1;     // non visité
+        arr[i].lowlink = -1;   // valeur minimum atteignable
+        arr[i].on_stack = 0;   // pas encore dans la pile
     }
     return arr;
 }
 
+// Libère le tableau des TarjanVertex
 void tarjan_free_vertices(TarjanVertex *arr) {
     free(arr);
 }
 
 
 // ---------- IntStack ----------
+// Agrandit la pile dynamique en cas de dépassement
 static void stack_grow(IntStack *S) {
     int newcap = (S->capacity < 4) ? 4 : (S->capacity * 2);
     int *nd = (int*)realloc(S->data, newcap * sizeof(int));
@@ -35,6 +38,7 @@ static void stack_grow(IntStack *S) {
     S->capacity = newcap;
 }
 
+// Crée une pile (stack) d'entiers
 IntStack stack_create(int capacity) {
     IntStack S;
     if (capacity < 1) capacity = 4;
@@ -48,11 +52,13 @@ IntStack stack_create(int capacity) {
     return S;
 }
 
+// Empile un entier
 void stack_push(IntStack *S, int v) {
     if (S->top >= S->capacity) stack_grow(S);
     S->data[S->top++] = v;
 }
 
+// Dépile un entier
 int stack_pop(IntStack *S) {
     if (S->top <= 0) {
         fprintf(stderr, "stack_pop on empty stack\n");
@@ -61,6 +67,7 @@ int stack_pop(IntStack *S) {
     return S->data[--S->top];
 }
 
+// Lit l'élément au sommet sans le retirer
 int stack_peek(const IntStack *S) {
     if (S->top <= 0) {
         fprintf(stderr, "stack_peek on empty stack\n");
@@ -69,10 +76,12 @@ int stack_peek(const IntStack *S) {
     return S->data[S->top - 1];
 }
 
+// 1 si pile vide
 int stack_empty(const IntStack *S) {
     return S->top == 0;
 }
 
+// Libère la pile
 void stack_free(IntStack *S) {
     free(S->data);
     S->data = NULL;
@@ -82,12 +91,12 @@ void stack_free(IntStack *S) {
 
 
 // ---------- TarjanClass ----------
+// Crée une nouvelle classe (C1, C2, ...)
 TarjanClass class_create(const char *name) {
     TarjanClass C;
     memset(&C, 0, sizeof(C));
     if (name) {
-        // limite 7 chars + '\0' (ex: "C12345")
-        strncpy(C.name, name, sizeof(C.name) - 1);
+        strncpy(C.name, name, sizeof(C.name) - 1); // copie du nom limité
     } else {
         strcpy(C.name, "C?");
     }
@@ -97,6 +106,7 @@ TarjanClass class_create(const char *name) {
     return C;
 }
 
+// Agrandit l'espace pour stocker plus de membres
 static void class_grow(TarjanClass *C) {
     int newcap = (C->capacity < 4) ? 4 : (C->capacity * 2);
     int *nm = (int*)realloc(C->members, newcap * sizeof(int));
@@ -108,11 +118,13 @@ static void class_grow(TarjanClass *C) {
     C->capacity = newcap;
 }
 
+// Ajoute un sommet dans une classe
 void class_add_member(TarjanClass *C, int vertex_id) {
     if (C->size >= C->capacity) class_grow(C);
     C->members[C->size++] = vertex_id;
 }
 
+// Libère les membres d'une classe
 void class_free(TarjanClass *C) {
     free(C->members);
     C->members = NULL;
@@ -120,6 +132,7 @@ void class_free(TarjanClass *C) {
     C->capacity = 0;
 }
 
+// Affiche une classe (ex : C1: {1,2,3})
 void class_print(const TarjanClass *C) {
     printf("Composante %s: {", C->name);
     for (int i = 0; i < C->size; ++i) {
@@ -131,6 +144,7 @@ void class_print(const TarjanClass *C) {
 
 
 // ---------- TarjanPartition ----------
+// Initialise une partition (liste des classes)
 TarjanPartition partition_create(void) {
     TarjanPartition P;
     P.classes = NULL;
@@ -139,6 +153,7 @@ TarjanPartition partition_create(void) {
     return P;
 }
 
+// Agrandit la partition
 static void partition_grow(TarjanPartition *P) {
     int newcap = (P->capacity < 4) ? 4 : (P->capacity * 2);
     TarjanClass *nc = (TarjanClass*)realloc(P->classes, newcap * sizeof(TarjanClass));
@@ -150,11 +165,13 @@ static void partition_grow(TarjanPartition *P) {
     P->capacity = newcap;
 }
 
+// Ajoute une classe dans la partition
 void partition_add_class(TarjanPartition *P, TarjanClass cls) {
     if (P->size >= P->capacity) partition_grow(P);
-    P->classes[P->size++] = cls; // copie "shallow" (les members restent possédés par cls)
+    P->classes[P->size++] = cls; // copie shallow
 }
 
+// Libère toutes les classes
 void partition_free(TarjanPartition *P) {
     if (!P || !P->classes) {
         P->size = P->capacity = 0;
@@ -169,15 +186,16 @@ void partition_free(TarjanPartition *P) {
     P->capacity = 0;
 }
 
+// Affiche toutes les classes
 void partition_print(const TarjanPartition *P) {
     for (int i = 0; i < P->size; ++i) {
         class_print(&P->classes[i]);
     }
-
 }
 
 
 // ================== TARJAN (DFS) ==================
+// Fonction récursive principale : détecte les SCC
 static void tarjan_dfs(int u,
                        const AdjList *G,
                        TarjanVertex *V,
@@ -185,33 +203,33 @@ static void tarjan_dfs(int u,
                        int *pIndex,
                        TarjanPartition *P)
 {
-    V[u].index   = *pIndex;
-    V[u].lowlink = *pIndex;
+    V[u].index   = *pIndex;   // index d’entrée
+    V[u].lowlink = *pIndex;   // valeur lowlink initiale
     (*pIndex)++;
 
     stack_push(S, u);
     V[u].on_stack = 1;
 
-    // Parcourt tous les voisins v de u
+    // Parcourt les voisins de u
     for (Cell *e = G->arr[u].head; e != NULL; e = e->next) {
         int v = e->dest;
         if (V[v].index == -1) {
-            // non visité
+            // non visité → exploration
             tarjan_dfs(v, G, V, S, pIndex, P);
             if (V[v].lowlink < V[u].lowlink) V[u].lowlink = V[v].lowlink;
         } else if (V[v].on_stack) {
-            // arête vers un sommet dans la pile
+            // arête vers un sommet dans la pile → mise à jour lowlink
             if (V[v].index < V[u].lowlink) V[u].lowlink = V[v].index;
         }
     }
 
-    // u est racine d'une composante ?
+    // u est racine → créer une nouvelle composante
     if (V[u].lowlink == V[u].index) {
-        // on dépile jusqu'à retrouver u
         char name[8];
         snprintf(name, sizeof(name), "C%d", P->size + 1);
         TarjanClass C = class_create(name);
 
+        // dépile jusqu’à u
         while (!stack_empty(S)) {
             int w = stack_pop(S);
             V[w].on_stack = 0;
@@ -222,6 +240,7 @@ static void tarjan_dfs(int u,
     }
 }
 
+// Lance l’algorithme de Tarjan sur tout le graphe
 TarjanPartition tarjan_run(const AdjList *G)
 {
     TarjanPartition P = partition_create();
@@ -237,17 +256,18 @@ TarjanPartition tarjan_run(const AdjList *G)
         }
     }
 
-    // Nettoyage des structures temporaires
+    // Nettoyage
     stack_free(&S);
     tarjan_free_vertices(V);
-    return P; // (les classes/members sont possédés par P)
+    return P;
 }
 
+
 // ============================================================================
-//  Hasse - Construction du diagramme entre classes (CFC)
+//  HASSE - Construction des liens entre classes
 // ============================================================================
 
-// Vérifie si un lien (from->to) existe déjà
+// Vérifie si un lien existe déjà
 static int link_exists(const t_link_array *L, int from, int to) {
     for (int i = 0; i < L->size; ++i) {
         if (L->data[i].from == from && L->data[i].to == to) return 1;
@@ -255,7 +275,7 @@ static int link_exists(const t_link_array *L, int from, int to) {
     return 0;
 }
 
-// map[v] = index de la classe dans la partition
+// map[v] = classe à laquelle appartient v
 int* build_vertex_to_class(const TarjanPartition *P, int n) {
     int *map = malloc((n + 1) * sizeof(int));
     if (!map) { perror("malloc map vertex->class"); exit(EXIT_FAILURE); }
@@ -271,7 +291,7 @@ int* build_vertex_to_class(const TarjanPartition *P, int n) {
     return map;
 }
 
-// Ajoute un lien dans la structure dynamique
+// Ajoute un lien from→to dans le tableau dynamique
 static void push_link(t_link_array *L, int a, int b) {
     if (L->size >= L->capacity) {
         int nc = (L->capacity < 8) ? 8 : L->capacity * 2;
@@ -284,7 +304,7 @@ static void push_link(t_link_array *L, int a, int b) {
     L->size++;
 }
 
-// Crée tous les liens entre classes
+// Crée tous les liens entre classes (pour le Hasse)
 void build_class_links(const AdjList *G, const TarjanPartition *P, t_link_array *links) {
     links->data = NULL;
     links->size = 0;
@@ -307,13 +327,13 @@ void build_class_links(const AdjList *G, const TarjanPartition *P, t_link_array 
     free(v2c);
 }
 
-// Affiche les liens entre classes
+// Affiche les liens Cx -> Cy
 void print_class_links(const t_link_array *links) {
     for (int i = 0; i < links->size; ++i)
         printf("Lien C%d -> C%d\n", links->data[i].from + 1, links->data[i].to + 1);
 }
 
-// Écrit une classe au format {1,7,5}
+// Écrit les membres d’une classe dans une chaîne Mermaid
 static void write_class_label(FILE *f, const TarjanClass *C) {
     fprintf(f, "{");
     for (int i = 0; i < C->size; ++i) {
@@ -323,7 +343,7 @@ static void write_class_label(FILE *f, const TarjanClass *C) {
     fprintf(f, "}");
 }
 
-// Exporte le diagramme de Hasse en format Mermaid
+// Exporte le diagramme de Hasse au format Mermaid
 void hasse_to_mermaid(const TarjanPartition *P, const t_link_array *links, const char *filename) {
     FILE *f = fopen(filename, "wt");
     if (!f) { perror("open mermaid hasse"); exit(EXIT_FAILURE); }
@@ -331,7 +351,7 @@ void hasse_to_mermaid(const TarjanPartition *P, const t_link_array *links, const
     fprintf(f, "---\nconfig:\n  layout: elk\n  theme: neo\n  look: neo\n---\n\n");
     fprintf(f, "flowchart TB\n");
 
-    // Nœuds (une box par classe)
+    // Création des noeuds (une boîte par SCC)
     for (int i = 0; i < P->size; ++i) {
         fprintf(f, "C%d[\"", i + 1);
         write_class_label(f, &P->classes[i]);
@@ -339,14 +359,10 @@ void hasse_to_mermaid(const TarjanPartition *P, const t_link_array *links, const
     }
 
     fprintf(f, "\n");
-    // Liens
+    // Ajout des liens entre classes
     for (int i = 0; i < links->size; ++i) {
         fprintf(f, "C%d --> C%d\n", links->data[i].from + 1, links->data[i].to + 1);
     }
 
     fclose(f);
 }
-
-
-
-
